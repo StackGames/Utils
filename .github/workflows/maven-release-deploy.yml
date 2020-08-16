@@ -1,0 +1,13 @@
+name: deploy maven package to release
+on:
+  push:
+    branches: master
+jobs:
+  maven-deploy:
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - uses: actions/checkout@v2
+      - run: mvn deploy --settings settings.xml -P github-release
+        env:
+          maven_username: ${{secrets.MAVEN_USERNAME}}
+          maven_password: ${{secrets.MAVEN_PASSWORD}}
