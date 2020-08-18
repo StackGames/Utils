@@ -1,0 +1,9 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+    <servers>
+        <server>
+            <id>stackgames-repo</id>
+            <username>${env.maven_username}</username>
+            <password>${env.maven_password}</password>
+        </server>
+    </servers>
+</settings>
