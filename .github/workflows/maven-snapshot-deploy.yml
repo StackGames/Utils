@@ -13,9 +13,6 @@ jobs:
         shell: bash
         run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
       - run: mvn clean
-      env:
-        maven_username: ${{secrets.MAVEN_USERNAME}}
-        maven_password: ${{secrets.MAVEN_PASSWORD}}
       - run: mvn deploy --settings settings.xml -P github-snapshot -Dbranch=${BRANCH_NAME}
         env:
           maven_username: ${{secrets.MAVEN_USERNAME}}
