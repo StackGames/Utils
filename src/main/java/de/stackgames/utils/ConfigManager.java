@@ -29,7 +29,6 @@ public class ConfigManager {
     public Optional<FileConfiguration> getCustomConfig(Plugin plugin, String configName) {
         File customConfigFile = new File(plugin.getDataFolder(), configName);
         if(!customConfigFile.exists()) {
-            customConfigFile.getParentFile().mkdirs();
             plugin.saveResource(configName, false);
         }
         return getFileConfiguration(configName, customConfigFile, plugin.getLogger());
