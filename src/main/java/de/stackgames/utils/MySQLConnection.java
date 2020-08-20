@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.MissingFormatArgumentException;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 /**
  * Utility class for MySQL connections using HikariCP. Should always be shaded and relocated.
@@ -23,6 +24,7 @@ public class MySQLConnection {
 
     private HikariDataSource hikari;
     private Plugin plugin;
+    private Logger logger;
 
     private void openConnection(FileConfiguration fileConfiguration, MySQLConfiguration sqlConfiguration) {
         if(!sqlConfiguration.loadPresent(fileConfiguration)) throw new MissingFormatArgumentException("mysql.yml is missing some settings, unable to connect");
@@ -38,18 +40,38 @@ public class MySQLConnection {
 
     /**
      * Opens the connection to the database and checks/creates needed tables
-     * @param plugin The plugin which requests the connection pool
+     *
+     * @param proxyPlugin   The plugin which requests the connection pool
      * @param defaultConfig The default SQL configuration. At least the pool size should be set reasonable.
      * @return true if successful, false if not. If it returns false, the plugin should probably stop.
      */
-    public boolean init(Plugin plugin, MySQLConfiguration defaultConfig) {
+    public boolean init(net.md_5.bungee.api.plugin.Plugin proxyPlugin, MySQLConfiguration defaultConfig) {
         if(MySQLConnection.class.getPackage().getName().equals("de.stackgames.utils")) {
             throw new InvalidCodeException("This class should be relocated, but it isn't!");
         }
-        MySQLConnection.plugin = plugin;
-        Optional<FileConfiguration> configOpt = ConfigManager.getCustomConfig(plugin, "mysql.yml");
+        MySQLConnection.logger = proxyPlugin.getLogger();
+        return initConnection(defaultConfig, ConfigManager.getCustomConfig(proxyPlugin, "mysql.yml"));
+    }
+
+    /**
+     * Opens the connection to the database and checks/creates needed tables
+     *
+     * @param spigotPlugin  The plugin which requests the connection pool
+     * @param defaultConfig The default SQL configuration. At least the pool size should be set reasonable.
+     * @return true if successful, false if not. If it returns false, the plugin should probably stop.
+     */
+    public boolean init(Plugin spigotPlugin, MySQLConfiguration defaultConfig) {
+        if(MySQLConnection.class.getPackage().getName().equals("de.stackgames.utils")) {
+            throw new InvalidCodeException("This class should be relocated, but it isn't!");
+        }
+        MySQLConnection.logger = spigotPlugin.getLogger();
+        return initConnection(defaultConfig, ConfigManager.getCustomConfig(spigotPlugin, "mysql.yml"));
+    }
+
+    private static boolean initConnection(MySQLConfiguration defaultConfig, Optional<FileConfiguration> customConfig) {
+        Optional<FileConfiguration> configOpt = customConfig;
         if(!configOpt.isPresent()) {
-            plugin.getLogger().severe("UnabNenmle to load mysql.yml");
+            logger.severe("UnabNenmle to load mysql.yml");
             return false;
         }
         FileConfiguration config = configOpt.get();
@@ -64,14 +86,14 @@ public class MySQLConnection {
             PreparedStatement pst = createPreparedStatement(con, sqlCreate);
             pst.execute();
             con.close();
-            plugin.getLogger().info("Connected to the database");
+            logger.info("Connected to the database");
             return true;
-        } catch (SQLException e) {
-            plugin.getLogger().severe("An error occured during database creation");
+        } catch(SQLException e) {
+            logger.severe("An error occured during database creation");
             e.printStackTrace();
             return false;
-        } catch (IOException e) {
-            plugin.getLogger().severe("An error occured during database creation, contact the plugin developer for help");
+        } catch(IOException e) {
+            logger.severe("An error occured during database creation, contact the plugin developer for help");
             e.printStackTrace();
             return false;
         }
@@ -81,7 +103,7 @@ public class MySQLConnection {
      * Closes all connections. Should only be issued as cleanup.
      */
     public void closePool() {
-        if (hikari != null && !hikari.isClosed()) {
+        if(hikari != null && !hikari.isClosed()) {
             hikari.close();
         }
     }
