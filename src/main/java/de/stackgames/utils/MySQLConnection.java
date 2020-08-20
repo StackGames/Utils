@@ -125,6 +125,9 @@ public class MySQLConnection {
      */
     @Deprecated
     public Connection getConnection() throws SQLException {
+        if(hikari == null || hikari.isClosed()) {
+            throw new NotInitializedException();
+        }
         return hikari.getConnection();
     }
 
@@ -148,7 +151,10 @@ public class MySQLConnection {
      * @param actionSummary      A quick summary of the action. Is getting logged if an SQLException occurs and will be used as thread name.
      * @param connectionCallable An asynchronous callable where the connection can be used
      */
-    public void doWithConnectionAsync(String actionSummary, MySQLConnection.ConnectionCallback connectionCallable) {
+    public static void doWithConnectionAsync(String actionSummary, MySQLConnection.ConnectionCallback connectionCallable) {
+        if(hikari == null || hikari.isClosed()) {
+            throw new NotInitializedException();
+        }
         new Thread(() -> {
             try(Connection connection = hikari.getConnection()) {
                 connectionCallable.doInConnection(connection);
@@ -168,6 +174,9 @@ public class MySQLConnection {
      * @deprecated It is blocking, use {@link MySQLConnection#doWithConnectionAsync(String, ConnectionCallback)} instead.
      */
     public void doWithConnectionSync(String actionSummary, MySQLConnection.ConnectionCallback connectionCallable) {
+        if(hikari == null || hikari.isClosed()) {
+            throw new NotInitializedException();
+        }
         try(Connection connection = hikari.getConnection()) {
             connectionCallable.doInConnection(connection);
         } catch(SQLException ex) {
@@ -181,6 +190,12 @@ public class MySQLConnection {
      */
     public interface ConnectionCallback {
         void doInConnection(Connection connection) throws SQLException;
+    }
+
+    private class NotInitializedException extends RuntimeException {
+        public NotInitializedException() {
+            super("MySQL-Connection was never initialized!");
+        }
     }
 
     private class InvalidCodeException extends RuntimeException {
