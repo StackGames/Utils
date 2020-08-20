@@ -23,11 +23,18 @@ import java.util.logging.Logger;
 public class MySQLConnection {
 
     private HikariDataSource hikari;
-    private Plugin plugin;
     private Logger logger;
+    private String pluginName;
+
+    private static void checkRelocation() {
+        if(MySQLConnection.class.getPackage().getName().equals("de.stackgames.utils")) {
+            throw new InvalidCodeException("This class should be relocated, but it isn't!");
+        }
+    }
 
     private void openConnection(FileConfiguration fileConfiguration, MySQLConfiguration sqlConfiguration) {
-        if(!sqlConfiguration.loadPresent(fileConfiguration)) throw new MissingFormatArgumentException("mysql.yml is missing some settings, unable to connect");
+        if(!sqlConfiguration.loadPresent(fileConfiguration))
+            throw new MissingFormatArgumentException("mysql.yml is missing some settings, unable to connect");
         hikari = new HikariDataSource();
         hikari.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
         hikari.addDataSourceProperty("serverName", sqlConfiguration.getHostname());
@@ -46,11 +53,15 @@ public class MySQLConnection {
      * @return true if successful, false if not. If it returns false, the plugin should probably stop.
      */
     public boolean init(net.md_5.bungee.api.plugin.Plugin proxyPlugin, MySQLConfiguration defaultConfig) {
-        if(MySQLConnection.class.getPackage().getName().equals("de.stackgames.utils")) {
-            throw new InvalidCodeException("This class should be relocated, but it isn't!");
-        }
+        checkRelocation();
         MySQLConnection.logger = proxyPlugin.getLogger();
-        return initConnection(defaultConfig, ConfigManager.getCustomConfig(proxyPlugin, "mysql.yml"));
+        MySQLConnection.pluginName = proxyPlugin.getDescription().getName();
+        Optional<FileConfiguration> config = ConfigManager.getCustomConfig(proxyPlugin, "mysql.yml");
+        if(!config.isPresent()) {
+            logger.severe("Unable to load mysql.yml");
+            return false;
+        }
+        return initConnection(defaultConfig, config.get());
     }
 
     /**
@@ -61,31 +72,28 @@ public class MySQLConnection {
      * @return true if successful, false if not. If it returns false, the plugin should probably stop.
      */
     public boolean init(Plugin spigotPlugin, MySQLConfiguration defaultConfig) {
-        if(MySQLConnection.class.getPackage().getName().equals("de.stackgames.utils")) {
-            throw new InvalidCodeException("This class should be relocated, but it isn't!");
-        }
+        checkRelocation();
         MySQLConnection.logger = spigotPlugin.getLogger();
-        return initConnection(defaultConfig, ConfigManager.getCustomConfig(spigotPlugin, "mysql.yml"));
-    }
-
-    private static boolean initConnection(MySQLConfiguration defaultConfig, Optional<FileConfiguration> customConfig) {
-        Optional<FileConfiguration> configOpt = customConfig;
-        if(!configOpt.isPresent()) {
-            logger.severe("UnabNenmle to load mysql.yml");
+        MySQLConnection.pluginName = spigotPlugin.getName();
+        Optional<FileConfiguration> config = ConfigManager.getCustomConfig(spigotPlugin, "mysql.yml");
+        if(!config.isPresent()) {
+            logger.severe("Unable to load mysql.yml");
             return false;
         }
-        FileConfiguration config = configOpt.get();
+        return initConnection(defaultConfig, config.get());
+    }
+
+    private static boolean initConnection(MySQLConfiguration defaultConfig, FileConfiguration config) {
         openConnection(config, defaultConfig);
-        try {
-            Connection con = hikari.getConnection();
+        try(Connection con = hikari.getConnection()) {
             URL fileUri = MySQLConnection.class.getClassLoader().getResource("database.sql");
             if(fileUri == null) {
                 throw new IOException("database.sql is missing");
             }
             String sqlCreate = IOUtils.toString(fileUri, StandardCharsets.UTF_8);
-            PreparedStatement pst = createPreparedStatement(con, sqlCreate);
-            pst.execute();
-            con.close();
+            try(PreparedStatement pst = con.prepareStatement(sqlCreate)) {
+                pst.execute();
+            }
             logger.info("Connected to the database");
             return true;
         } catch(SQLException e) {
@@ -142,8 +150,13 @@ public class MySQLConnection {
      */
     public void doWithConnectionAsync(String actionSummary, MySQLConnection.ConnectionCallback connectionCallable) {
         new Thread(() -> {
-            doWithConnectionSync(actionSummary, connectionCallable);
-        }, plugin.getName() + "-" + actionSummary + "-Thread").start();
+            try(Connection connection = hikari.getConnection()) {
+                connectionCallable.doInConnection(connection);
+            } catch(SQLException ex) {
+                logger.severe("Error during database action: " + actionSummary);
+                ex.printStackTrace();
+            }
+        }, pluginName + "-" + actionSummary + "-Thread").start();
     }
 
     /**
@@ -152,12 +165,13 @@ public class MySQLConnection {
      *
      * @param actionSummary      A quick summary of the action. Is getting logged if an SQLException occurs.
      * @param connectionCallable An synchronous callable where the connection can be used
+     * @deprecated It is blocking, use {@link MySQLConnection#doWithConnectionAsync(String, ConnectionCallback)} instead.
      */
     public void doWithConnectionSync(String actionSummary, MySQLConnection.ConnectionCallback connectionCallable) {
-        try (Connection connection = hikari.getConnection()) {
+        try(Connection connection = hikari.getConnection()) {
             connectionCallable.doInConnection(connection);
-        } catch (SQLException ex) {
-            plugin.getLogger().severe("Error during database action: " + actionSummary);
+        } catch(SQLException ex) {
+            logger.severe("Error during database action: " + actionSummary);
             ex.printStackTrace();
         }
     }
