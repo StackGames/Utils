@@ -6,6 +6,7 @@ import org.apache.commons.io.IOUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -76,6 +77,27 @@ public class MySQLConnection {
         MySQLConnection.logger = spigotPlugin.getLogger();
         MySQLConnection.pluginName = spigotPlugin.getName();
         Optional<FileConfiguration> config = ConfigManager.getCustomConfig(spigotPlugin, "mysql.yml");
+        if(!config.isPresent()) {
+            logger.severe("Unable to load mysql.yml");
+            return false;
+        }
+        return initConnection(defaultConfig, config.get());
+    }
+
+    /**
+     * Opens the connection to the database and checks/creates needed tables
+     *
+     * @param dataFolder    The folder where the config should reside
+     * @param logger        The logger which is used in case of errors
+     * @param pluginName    The name of the plugin (used in thread names)
+     * @param defaultConfig The default SQL configuration. At least the pool size should be set reasonable.
+     * @return true if successful, false if not. If it returns false, the plugin should probably stop.
+     */
+    public boolean init(File dataFolder, Logger logger, String pluginName, MySQLConfiguration defaultConfig) {
+        checkRelocation();
+        MySQLConnection.logger = logger;
+        MySQLConnection.pluginName = pluginName;
+        Optional<FileConfiguration> config = ConfigManager.getCustomConfig(dataFolder, logger, "mysql.yml");
         if(!config.isPresent()) {
             logger.severe("Unable to load mysql.yml");
             return false;

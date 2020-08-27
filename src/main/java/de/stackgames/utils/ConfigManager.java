@@ -52,6 +52,25 @@ public class ConfigManager {
         return getFileConfiguration(configName, customConfigFile, plugin.getLogger());
     }
 
+    /**
+     * Gets a custom configuration file. If it is not present, it will be created.
+     * Needs a file in the JAR as template with the same filename.
+     * Will also create the folder if not present
+     * (BungeeCord version)
+     *
+     * @param dataFolder The folder where the config should reside
+     * @param logger     The logger which should be used in case of errors
+     * @param configName The name of the config file. Should be the same as the sample file in ressources
+     * @return the configuration, if found or Optional.empty() if not
+     */
+    public Optional<FileConfiguration> getCustomConfig(File dataFolder, Logger logger, String configName) {
+        File customConfigFile = new File(dataFolder, configName);
+        if(!customConfigFile.exists()) {
+            saveResource(dataFolder, configName, logger);
+        }
+        return getFileConfiguration(configName, customConfigFile, logger);
+    }
+
     private Optional<FileConfiguration> getFileConfiguration(String configName, File customConfigFile, Logger logger) {
         FileConfiguration customConfig = new YamlConfiguration();
         try {
