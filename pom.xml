@@ -72,32 +72,6 @@
         </dependency>
     </dependencies>
 
-
-    <profiles>
-        <profile>
-            <id>manual-build</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <projectVersionTag>SNAPSHOT</projectVersionTag>
-            </properties>
-        </profile>
-        <profile>
-            <id>github-snapshot</id>
-            <properties>
-                <!--suppress UnresolvedMavenProperty -->
-                <projectVersionTag>${branch}-SNAPSHOT</projectVersionTag>
-            </properties>
-        </profile>
-        <profile>
-            <id>github-release</id>
-            <properties>
-                <projectVersionTag>RELEASE</projectVersionTag>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -128,24 +102,6 @@
                                         <exclude>mariadb.properties</exclude>
                                     </excludes>
                                 </filter>
-                                <!--<filter>
-                                    <artifact>com.zaxxer:HikariCP</artifact>
-                                    <includes>
-                                        <include>com/zaxxer/hikari/**</include>
-                                    </includes>
-                                </filter>
-                                <filter>
-                                    <artifact>org.slf4j:slf4j-api</artifact>
-                                    <includes>
-                                        <include>org/slf4j/**</include>
-                                    </includes>
-                                </filter>
-                                <filter>
-                                    <artifact>org.projectlombok:lombok</artifact>
-                                    <excludes>
-                                        <exclude>secondaryLoading.SCL.lombok/**</exclude>
-                                    </excludes>
-                                </filter>-->
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
