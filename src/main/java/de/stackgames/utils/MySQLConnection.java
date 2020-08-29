@@ -28,7 +28,7 @@ public class MySQLConnection {
     private String pluginName;
 
     private static void checkRelocation() {
-        if(MySQLConnection.class.getPackage().getName().equals("de.stackgames.utils")) {
+        if(MySQLConnection.class.getPackage().getName().endsWith("e.stackgames.utils")) {
             throw new InvalidCodeException("This class should be relocated, but it isn't!");
         }
     }
