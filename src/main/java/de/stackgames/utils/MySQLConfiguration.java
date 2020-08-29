@@ -43,9 +43,9 @@ public class MySQLConfiguration {
         if(section.isInt("port")) {
             port = section.getInt("port");
         }
-        String database = section.getString("database");
-        String username = section.getString("username");
-        String password = section.getString("password");
+        database = section.getString("database");
+        username = section.getString("username");
+        password = section.getString("password");
         if(section.isInt("max_pool_size")) {
             maxPoolSize = section.getInt("max_pool_size");
         }
