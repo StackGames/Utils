@@ -71,6 +71,12 @@
             <version>2.7</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.30</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,14 +129,6 @@
                                 <relocation>
                                     <pattern>org.mariadb.jdbc</pattern>
                                     <shadedPattern>de.stackgames.utils.shaded.mariadb.jdbc</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.slf4j</pattern>
-                                    <shadedPattern>de.stackgames.utils.shaded.slf4j</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.slf4j</pattern>
-                                    <shadedPattern>de.stackgames.utils.shaded.slf4j</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.apache.commons</pattern>
