@@ -36,6 +36,12 @@ public class MySQLConnection {
     private void openConnection(FileConfiguration fileConfiguration, MySQLConfiguration sqlConfiguration) {
         if(!sqlConfiguration.loadPresent(fileConfiguration))
             throw new MissingFormatArgumentException("mysql.yml is missing some settings, unable to connect");
+        System.out.println("Database: " + sqlConfiguration.getDatabase());
+        System.out.println("Hostname: " + sqlConfiguration.getHostname());
+        System.out.println("Password: " + sqlConfiguration.getPassword());
+        System.out.println("Username: " + sqlConfiguration.getUsername());
+        System.out.println("Port: " + sqlConfiguration.getPort());
+        System.out.println("MaxPoolSize: " + sqlConfiguration.getMaxPoolSize());
         hikari = new HikariDataSource();
         hikari.setDataSourceClassName("org.mariadb.jdbc.MariaDbDataSource");
         hikari.addDataSourceProperty("serverName", sqlConfiguration.getHostname());
