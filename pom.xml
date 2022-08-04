@@ -14,7 +14,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <ignoreSnapshots>true</ignoreSnapshots>
+        <github.global.server>github</github.global.server>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub StackGames Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/StackGames/Utils</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
