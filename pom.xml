@@ -8,22 +8,13 @@
     </scm>
 
     <groupId>de.stackgames.utils</groupId>
-    <artifactId>Utils</artifactId>
+    <artifactId>utils</artifactId>
     <version>1.4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <ignoreSnapshots>true</ignoreSnapshots>
         <github.global.server>github</github.global.server>
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub StackGames Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/StackGames/Utils</url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <repository>
@@ -31,6 +22,15 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/StackGames/Utils</url>
+        </repository>
+    </distributionManagement>
+
 
     <dependencies>
         <dependency>
