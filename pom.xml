@@ -16,17 +16,6 @@
         <ignoreSnapshots>true</ignoreSnapshots>
     </properties>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>stackgames-repo</id>
-            <url>https://maven.juntv.de/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>stackgames-repo</id>
-            <url>https://maven.juntv.de/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
-
     <repositories>
         <repository>
             <id>papermc</id>
