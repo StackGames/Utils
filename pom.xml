@@ -9,7 +9,7 @@
 
     <groupId>de.stackgames.utils</groupId>
     <artifactId>utils</artifactId>
-    <version>1.4</version>
+    <version>1.4.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
