@@ -22,8 +22,12 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+        server-id: custom
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
 
     - name: Publish to GitHub Packages Apache Maven
       run: mvn --batch-mode deploy
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
