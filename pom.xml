@@ -13,7 +13,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <github.global.server>github</github.global.server>
     </properties>
 
     <repositories>
@@ -25,9 +24,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/StackGames/Utils</url>
+            <id>custom</id>
+            <name>Custom package registry</name>
+            <url>https://maven.ein.dev/repository/stackgames-repo/</url>
         </repository>
     </distributionManagement>
 
